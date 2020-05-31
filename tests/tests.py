@@ -33,4 +33,5 @@ def test_can_resize():
         img = cv.imread(file_, cv.IMREAD_UNCHANGED)
         print(file_)
         img = resize(img, (500, 500))
+        assert img.shape[:2] == (500, 500)
         assert img.shape == (500, 500, 3)

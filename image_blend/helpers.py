@@ -8,7 +8,7 @@ def image_weight(image_list):
 
 def create_file_list(directory):
     file_list = os.listdir(directory)
-    image_list = [f'{directory}/{file_}' for file_ in file_list if file_.endswith(('jpg','jpeg'))]
+    image_list = [f'{directory}/{file_}' for file_ in file_list if file_.endswith(('jpg','jpeg', 'png',))]
     return image_list
 
 def resize(img, size):
@@ -24,16 +24,16 @@ def resize(img, size):
 
     if aspect < 1:
         # Vertical image
-        new_w = int(sw*aspect)
+        new_w = int(round(sw*aspect))
         new_h = sh
-        padding = (sw-sw*aspect)/2
+        padding = (sw - new_w)/2
         pad_left, pad_right = int(np.ceil(padding)), int(np.floor(padding))
         pad_top, pad_bot = 0, 0
     elif aspect > 1:
         # Horizontal image
         new_w = sw
-        new_h = int(sh/aspect)
-        padding = (sh - sh/aspect)/2
+        new_h = int(round(sh/aspect))
+        padding = (sh - new_h)/2
         pad_top, pad_bot = int(np.ceil(padding)), int(np.floor(padding))
         pad_left, pad_right = 0, 0
     else:
@@ -42,7 +42,14 @@ def resize(img, size):
         new_h = sh
         pad_top, pad_bot, pad_left, pad_right = 0, 0, 0, 0
     
+    if img.shape[2] == 4:
+        img = img[:,:,:3]
+    else:
+        pass
+
     img = cv.resize(img, (new_w, new_h), interpolation=interp)
     img = cv.copyMakeBorder(img, pad_top, pad_bot, pad_left, pad_right, borderType=cv.BORDER_CONSTANT, value=(255, 255, 255))
     print(img.shape)
     return img
+
+
