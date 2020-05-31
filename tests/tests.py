@@ -1,8 +1,9 @@
 import pytest
 import os
 import shutil
+import cv2 as cv
 
-from helpers import image_weight, create_file_list
+from image_blend.helpers import image_weight, create_file_list, resize
 
 @pytest.fixture
 def image_files():
@@ -26,3 +27,10 @@ def test_can_create_file_list(image_files):
     file_list = create_file_list(image_files)
     assert len(file_list) == 4
 
+def test_can_resize():
+    file_list = create_file_list('tests/images')
+    for file_ in file_list:
+        img = cv.imread(file_, cv.IMREAD_UNCHANGED)
+        print(file_)
+        img = resize(img, (500, 500))
+        assert img.shape == (500, 500, 3)
