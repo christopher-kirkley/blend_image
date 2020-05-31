@@ -1,7 +1,7 @@
 import cv2 as cv
 import argparse
 
-from helpers import image_weight, create_file_list
+from helpers import image_weight, create_file_list, resize
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='image_blend',
@@ -30,7 +30,7 @@ if __name__ == '__main__':
         print(index, image)
         img = cv.imread(image, cv.IMREAD_UNCHANGED)
         print(img.shape)
-        img = cv.resize(img, dim, interpolation = cv.INTER_AREA)
+        img = resize(img, dim)
         image_list[index] = img * weight
     combined_image = sum(image_list).astype("uint8")
     cv.imwrite(f'{args.output}.jpg', combined_image)
