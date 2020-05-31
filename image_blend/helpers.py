@@ -1,6 +1,10 @@
 import os
 import cv2 as cv
 import numpy as np
+import requests
+import shutil
+
+from config import FLICKR_KEY
 
 def image_weight(image_list):
     percent = 1/len(image_list)
@@ -13,7 +17,7 @@ def create_file_list(directory):
 
 def resize(img, size):
     sh, sw = size
-    h, w, _ = img.shape
+    h, w, *_ = img.shape
     aspect = w/h
 
     # interpolation method
@@ -42,10 +46,10 @@ def resize(img, size):
         new_h = sh
         pad_top, pad_bot, pad_left, pad_right = 0, 0, 0, 0
     
-    if img.shape[2] == 4:
+    if len(img.shape) == 2:
+         img = cv.cvtColor(img, cv.COLOR_GRAY2BGR)
+    elif img.shape[2] == 4:
         img = img[:,:,:3]
-    else:
-        pass
 
     img = cv.resize(img, (new_w, new_h), interpolation=interp)
     img = cv.copyMakeBorder(img, pad_top, pad_bot, pad_left, pad_right, borderType=cv.BORDER_CONSTANT, value=(255, 255, 255))
@@ -53,3 +57,35 @@ def resize(img, size):
     return img
 
 
+def resp_from_location(lat, lon):
+    r = requests.get(f'https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key={FLICKR_KEY}&accuracy=16&lat={lat}&lon={lon}&format=json&nojsoncallback=1')
+    return r
+
+def resp_from_keyword(keyword):
+    r = requests.get(f'https://www.flickr.com/services/rest/?method=flickr.photos.search&api_key={FLICKR_KEY}&tags={keyword}&format=json&nojsoncallback=1')
+    return r
+
+def create_flickr_photo_list(response):
+    json_result = response.json()
+    photos = json_result['photos']['photo']
+    photo_list = []
+    for photo in photos:
+        url = f'https://farm{photo["farm"]}.staticflickr.com/{photo["server"]}/{photo["id"]}_{photo["secret"]}.jpg'
+        photo_list.append(url)
+    return photo_list
+
+def download_photo(photo_list):
+    os.mkdir('temp')
+    for index, url in enumerate(photo_list):
+        # download url
+        filename = url.split("/")[-1]
+        r = requests.get(url, stream = True)
+        if r.status_code == 200:
+            r.raw.decode_content = True
+        with open(f'temp/{filename}', 'wb') as f:
+            shutil.copyfileobj(r.raw, f)
+    return True
+
+def clean_up():
+    shutil.rmtree('temp')
+    return True

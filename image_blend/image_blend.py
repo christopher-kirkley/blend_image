@@ -7,16 +7,30 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(prog='image_blend',
                                     description='Blend together directory of images',
                                     usage = '%(prog)s -d [options] directory output',)
-    parser.add_argument('-d',
+    parser.add_argument('-s',
                         dest='data',
                         nargs=2,
-                        help='dimensions of output image',
+                        help='size of output image',
                         type=int,
                         action='store',
                         required=True,
                         )
 
-    parser.add_argument('directory', type=str, help='directory')
+    parser.add_argument('-f',
+                        dest='data',
+                        nargs=1,
+                        help='flickr keyword',
+                        type=str,
+                        action='store',
+                        )
+
+    parser.add_argument('-d',
+                        dest='data',
+                        nargs='1',
+                        help='directory of source files',
+                        type=str,
+                        action='store',
+                        )
 
     parser.add_argument('output', type=str, help='output')
 
