@@ -36,16 +36,27 @@ if __name__ == '__main__':
 
     args = parser.parse_args()
 
+    def transform(image_list):
+        for index, image in enumerate(image_list):
+            print(index, image)
+            img = cv.imread(image, cv.IMREAD_UNCHANGED)
+            print(img.shape)
+            img = resize(img, dim)
+            img = img * weight
+            combined += img
+            yield combined
+
     dim = tuple(args.data)
     print(dim)
     image_list = create_file_list(args.directory)
     weight = image_weight(image_list)
-    for index, image in enumerate(image_list):
-        print(index, image)
-        img = cv.imread(image, cv.IMREAD_UNCHANGED)
-        print(img.shape)
-        img = resize(img, dim)
-        image_list[index] = img * weight
-    combined_image = sum(image_list).astype("uint8")
+    combined_image = transform(image_list).astype("uint8")
+    # for index, image in enumerate(image_list):
+    #     print(index, image)
+    #     img = cv.imread(image, cv.IMREAD_UNCHANGED)
+    #     print(img.shape)
+    #     img = resize(img, dim)
+    #     image_list[index] = img * weight
+    # combined_image = sum(image_list).astype("uint8")
     cv.imwrite(f'{args.output}.jpg', combined_image)
 
