@@ -63,13 +63,24 @@ if __name__ == '__main__':
     else:
         image_list = create_file_list(args.directory[0])
     weight = image_weight(image_list)
-    for index, image in enumerate(image_list):
-        print(index)
-        img = cv.imread(image, cv.IMREAD_UNCHANGED)
-        img = resize(img, dim)
-        image_list[index] = img * weight
-    combined_image = sum(image_list).astype("uint8")
-    cv.imwrite(f'{args.output}.jpg', combined_image)
+
+    def transform(image_list):
+        for index, image in enumerate(image_list):
+            print(index, image)
+            img = cv.imread(image, cv.IMREAD_UNCHANGED)
+            print(img.shape)
+            img = resize(img, dim)
+            img = img * weight
+            yield img
+
+    weight = image_weight(image_list)
+    image_generator = transform(image_list)
+    new_image = 0
+    for image in image_generator:
+        new_image += image
+    combined_image = new_image.astype("uint8")
+    # make output directory if not exists
+    cv.imwrite(f'output/{args.output}.jpg', combined_image)
     # try:
     #     clean_up()
     # except:
