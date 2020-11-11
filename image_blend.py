@@ -81,8 +81,8 @@ if __name__ == '__main__':
     combined_image = new_image.astype("uint8")
     # make output directory if not exists
     cv.imwrite(f'output/{args.output}.jpg', combined_image)
-    # try:
-    #     clean_up()
-    # except:
-    #     pass
+    try:
+        clean_up()
+    except:
+        pass
 
